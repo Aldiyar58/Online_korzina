@@ -1,1 +1,11 @@
-Flask==3.0.0
+flask
+python-dotenv
+SQLAlchemy
+flask_sqlalchemy
+psycopg2-binary
+flask-jwt-extended
+marshmallow
+werkzeug
+flask-cors
+Flask-Mail
+googletrans==3.1.0a0
