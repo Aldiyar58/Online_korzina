@@ -13,7 +13,8 @@ class User(db.Model):
     email = db.Column(db.String(150), nullable=False)
     password = db.Column(db.Text)
 
-    pr = db.relationship('Profiles', backref='users', uselist=Fals
+    pr = db.relationship('Profiles', backref='users', uselist=False)
+
     def __repr__(self):
         return f'<User "{self.id}">'
 
