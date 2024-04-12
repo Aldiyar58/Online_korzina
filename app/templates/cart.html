@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px; /* Set a max-width for the list */
+        }
+        li {
+            background-color: white;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center; /* Aligns items vertically center */
+            justify-content: space-between; /* Distributes space between and around content items */
+        }
+        img {
+            width: 100px; /* Fixed width for consistency */
+            height: 100px; /* Fixed height for consistency */
+            border-radius: 50%; /* Circular images */
+            margin-right: 20px;
+        }
+        a {
+            color: #5c67f2;
+            text-decoration: none;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Cart</h1>
+    {% if products %}
+        <ul>
+            {% for product in products %}
+            <li>
+                <div style="display: flex; align-items: center;">
+                    <img src="{{ product.photo }}" alt="{{ product.name }}">
+                    <div>
+                        <strong>{{ product.name }}</strong> - {{ product.cost }} KZT
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No products found in your cart.</p>
+    {% endif %}
+    <a href="{{ url_for('search.search_form') }}">Back to Search</a>
+</body>
+</html>

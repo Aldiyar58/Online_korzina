@@ -1,7 +1,7 @@
 import re
 from flask import jsonify, request, session, make_response
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, get_jwt, decode_token)
-from app.models import User, TokenBlocklist
+from app.models import User, TokenBlocklist, Profile, Family
 from app.auth import bp
 
 
@@ -35,44 +35,53 @@ def user_exists(email):
 def register_user():
     data = request.get_json()
 
-    if not valid_email(email=data.get('email')):
-        return jsonify(message='not valid email'), False
-
-    if not valid_password(password=data.get('password'), confirm_password=data.get('confirm_password')):
-        return jsonify(message='not valid email or password and confirm_password not same'), False
-
+    # if not valid_email(email=data.get('email')):
+    #     return jsonify(message='not valid email'), False
+    #
+    # if not valid_password(password=data.get('password'), confirm_password=data.get('confirm_password')):
+    #     return jsonify(message='not valid email or password and confirm_password not same'), False
+    #
     if user_exists(email=data.get('email')):
         return jsonify({'error': 'User already exists'}), False
 
-    new_user = User(
-        email=data.get('email'),
-        role=data.get('role')
+    new_family = Family(
+        name=data.get('family_name')
     )
+    new_family.save()
 
+    new_user = User(
+        family_id=new_family.id,
+        email=data.get('email')
+    )
     new_user.set_password(password=data.get('password'))
-
     new_user.save()
 
-    return jsonify({'message': 'User created'})
+    user_profile = Profile(
+        user_id=new_user.id,
+        firstname=data.get('firstname'),
+        lastname=data.get('lastname')
+    )
+    user_profile.save()
+
+    return jsonify({'message': 'User created'}), 200
 
 
 @bp.post('/login')
 def login_user():
     data = request.get_json()
     user = user_exists(data.get('email'))
-    if not valid_password(password=data.get('password')):
-        return jsonify(message='valid password')
+    # if not valid_password(password=data.get('password')):
+    #     return jsonify(message='valid password')
 
     if user and (user.check_password(password=data.get('password'))):
 
-        access_token = create_access_token(identity=user.email, additional_claims={"role": user.role})
-        refresh_token = create_refresh_token(identity=user.email, additional_claims={"role": user.role})
+        access_token = create_access_token(identity=user.id, additional_claims={"family_id": user.family_id})
+        refresh_token = create_refresh_token(identity=user.id, additional_claims={"family_id": user.family_id})
 
         rs = make_response(jsonify(access_token=access_token))
-        rs.set_cookie(key='refresh_token_cookie', value=refresh_token, path='/auth/refresh', httponly=True, secure=True)
+        rs.set_cookie(key='refresh_token_cookie', value=refresh_token, path='/api/auth/refresh', httponly=True, secure=True)
+        rs.set_cookie(key='access_token_cookie', value=refresh_token, path='/', httponly=True, secure=True)
         freshen_session(decode_token(encoded_token=access_token))
-        # response = jsonify(access_token=access_token)
-        # set_refresh_cookies(resp, refresh_token)
 
         return rs, 200
 
@@ -99,8 +108,8 @@ def refresh_access():
 
 
 def freshen_session(payload):
-    session['Email'] = payload['sub']
-    session['Role'] = payload['role']
+    session['Id'] = payload['sub']
+    session['FamilyId'] = payload['family_id']
     session['AccessIssueTime'] = payload['exp']
 
 

@@ -18,6 +18,12 @@ def create_app(config_class=Config):
     print(db)
 
     # Register blueprints here
+    from app.search import bp as search_bp
+    app.register_blueprint(search_bp)
+
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
     # load user
@@ -61,10 +67,10 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     app = create_app()
-    from app.extensions import db
-    from app.models import User, Profile, TokenBlocklist, Product, ProductList
-    with app.app_context():
-        db.drop_all()
-    with app.app_context():
-        db.create_all()
+    # from app.extensions import db
+    # from app.models import User, Profile, TokenBlocklist, product, ProductList
+    # with app.app_context():
+    #     db.drop_all()
+    # with app.app_context():
+    #     db.create_all()
     app.run(debug=True)

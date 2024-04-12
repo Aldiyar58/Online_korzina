@@ -9,5 +9,6 @@ werkzeug
 flask-cors
 Flask-Mail
 googletrans==3.1.0a0
+requests==2.31.0
 gunicorn
 eventlet

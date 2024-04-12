@@ -8,12 +8,12 @@ from app.models import Family
 
 class User(db.Model):
     __tablename__ = 'user'
-    id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
+    id = db.Column(db.String(), primary_key=True, default=lambda: str(uuid4()))
     family_id = db.Column(db.String(), db.ForeignKey('family.id'))
     email = db.Column(db.String(150), nullable=False)
     password = db.Column(db.Text)
 
-    pr = db.relationship('Profiles', backref='users', uselist=False)
+    pr = db.relationship('Profile', backref='users', uselist=False)
 
     def __repr__(self):
         return f'<User "{self.id}">'
@@ -24,6 +24,13 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    def change_family_id(self, new_family_id):
+        self.family_id = new_family_id
+
+    @classmethod
+    def get_user_by_id(cls, user_id):
+        return cls.query.filter_by(id=user_id).first()
+
     @classmethod
     def get_user_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
@@ -32,6 +39,21 @@ class User(db.Model):
     def get_all_user_email(cls):
         real_users = cls.query.filter(not_(cls.email.contains('example'))).all()
         return [user.email for user in real_users]
+
+    @classmethod
+    def join_in_family(cls, inviter_email, email):
+        inviter = cls.get_user_by_email(inviter_email)
+        user = cls.get_user_by_email(email)
+
+        # if not inviter or not user:
+        #     return False, "Один из пользователей не найден."
+        #
+        # if not inviter.family_id:
+        #     return False, "У пригласившего пользователя нет семейного идентификатора."
+
+        user.family_id = inviter.family_id
+        user.save()
+        return True, "Пользователь успешно добавлен в семью."
 
     @classmethod
     def update_email(cls, email, new_email, password):

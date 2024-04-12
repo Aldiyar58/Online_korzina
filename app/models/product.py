@@ -1,4 +1,5 @@
 from app.extensions import db
+from flask import jsonify
 
 
 class Product(db.Model):
@@ -14,6 +15,10 @@ class Product(db.Model):
 
     def __repr__(self):
         return f'<Product_list "{self.id}">'
+
+    @classmethod
+    def get_pasha(cls, category):
+        return jsonify(cls.query.filter_by(category=category).all())
 
     def save(self):
         db.session.add(self)

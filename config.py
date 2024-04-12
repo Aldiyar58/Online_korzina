@@ -12,8 +12,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     JWT_SECRET_KEY = os.getenv('FLASK_JWT_SECRET_KEY')
-    JWT_TOKEN_LOCATION = ["headers", 'cookies']
+    JWT_TOKEN_LOCATION = ['cookies']
     JWT_REFRESH_COOKIE_NAME = "refresh_token_cookie"
+    JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
     JWT_COOKIE_SECURE = True
     JWT_ACCESS_TOKEN_EXPIRES = dt.timedelta(minutes=20)
     JWT_REFRESH_TOKEN_EXPIRES = dt.timedelta(days=30)

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px;
+        }
+        li {
+            background-color: white;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        button, .pagination li {
+            background-color: #5c67f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover, .pagination li:hover {
+            background-color: #5058e2;
+        }
+        .pagination {
+            display: flex;
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .pagination li.active {
+            background-color: #4048c2;
+        }
+        .pagination li.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        a {
+            color: #5c67f2;
+            text-decoration: none;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Results</h1>
+    {% if products %}
+        <form action="{{ url_for('search.add_to_cart') }}" method="post">
+            <ul>
+                {% for product in products %}
+                <li>
+                    <input type="checkbox" name="selected_products" value="{{ product.id }}">
+                    <img src="{{ product.photo }}" alt="{{ product.name }} Image">
+                    {{ product.name }} - ${{ product.cost }}
+                </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Add to Cart</button>
+        </form>
+        <div class="pagination">
+            {% if current_page > 1 %}
+                <li onclick="location.href='{{ url_for('search.search_results', query=query, page=current_page-1) }}';">Prev</li>
+            {% else %}
+                <li class="disabled">Prev</li>
+            {% endif %}
+
+            {% set start_page = [current_page-2, 1] | max %}
+            {% set end_page = [current_page+2, total_pages] | min %}
+            {% for page_num in range(start_page, end_page + 1) %}
+                <li class="{{ 'active' if page_num == current_page else '' }}" onclick="location.href='{{ url_for('search.search_results', query=query, page=page_num) }}';">
+                    {{ page_num }}
+                </li>
+            {% endfor %}
+
+            {% if current_page < total_pages %}
+                <li onclick="location.href='{{ url_for('search.search_results', query=query, page=current_page+1) }}';">Next</li>
+            {% else %}
+                <li class="disabled">Next</li>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>No products found.</p>
+    {% endif %}
+    <a href="{{ url_for('search.search_form') }}">Back to Search</a>
+</body>
+</html>
