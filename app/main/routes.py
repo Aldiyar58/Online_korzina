@@ -40,7 +40,7 @@ def claim_invite(inviter, email):
     response = User.join_in_family(inviter_email=inviter, email=email)
     print(inviter, email)
     print(response)
-    return redirect(url_for(endpoint='main.index'))
+    return redirect(url_for(endpoint='search.search'))
 
 
 @bp.route('/signin', methods=['GET', 'POST'])
